@@ -2,6 +2,9 @@ openapi: 3.0.1
 info:
   version: 0.0.1
   title: Sample
+x-components:
+  constants:
+    max-limit-size: &max-limit-size 200
 paths:
   "/hello":
     get:
@@ -33,6 +36,6 @@ components:
     Limit:
       type: integer
       format: int32
-      maximum: 20
+      maximum: *max-limit-size
       minimum: 1
       default: 10
