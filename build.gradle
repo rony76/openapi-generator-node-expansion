@@ -2,6 +2,8 @@ plugins {
     id 'org.springframework.boot' version '2.6.1'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
+    id 'org.openapi.generator' version '5.3.0'
+    id 'idea'
 }
 
 group = 'org.openapitools.codegen'
@@ -13,11 +15,43 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-data-rest'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    implementation 'io.swagger:swagger-annotations:1.5.20'
+    implementation 'org.openapitools:jackson-databind-nullable:0.2.2'
+
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
 test {
     useJUnitPlatform()
+}
+
+openApiGenerate {
+    generatorName = 'spring'
+    inputSpec = "$rootDir/src/main/resources/static/spec.yaml".toString()
+    outputDir = "$buildDir/generated".toString()
+    apiPackage = 'org.openapitools.codegen.maximumlimit.api'
+    invokerPackage = 'org.openapitools.codegen.maximumlimit.invoker'
+    modelPackage = 'org.openapitools.codegen.maximumlimit.dto'
+    configOptions = [
+            library              : 'spring-boot',
+            performBeanValidation: 'true',
+            dateLibrary          : 'java8',
+            title                : 'Sample project',
+            interfaceOnly        : 'true'
+    ]
+}
+
+compileJava {
+    dependsOn tasks.openApiGenerate
+}
+
+// ignore the following
+sourceSets.main.java.srcDir new File(buildDir, 'generated/src/main/java')
+idea {
+    module {
+        generatedSourceDirs += new File(buildDir, 'generated/src/main/java')
+    }
 }
